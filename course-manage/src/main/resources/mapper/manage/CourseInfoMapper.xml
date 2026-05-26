@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.manage.mapper.CourseInfoMapper">
-    
+
     <resultMap type="CourseInfo" id="CourseInfoResult">
         <result property="id"    column="id"    />
         <result property="courseType"    column="course_type"    />
@@ -28,16 +28,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCourseInfoList" parameterType="CourseInfo" resultMap="CourseInfoResult">
         <include refid="selectCourseInfoVo"/>
-        <where>  
-            <if test="id != null "> and id = #{id}</if>
-            <if test="courseType != null  and courseType != ''"> and course_type = #{courseType}</if>
-            <if test="courseName != null  and courseName != ''"> and course_name like concat('%', #{courseName}, '%')</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        <where>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="courseType != null  and courseType != ''">and course_type = #{courseType}</if>
+            <if test="courseName != null  and courseName != ''">and course_name like concat('%', #{courseName}, '%')
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
+        <choose>
+            <when test="params.sortSql != null and params.sortSql != ''">
+                ${params.sortSql}
+            </when>
+            <otherwise>
+                order by order_num asc,create_time desc
+            </otherwise>
+        </choose>
     </select>
-    
+
     <select id="selectCourseInfoById" parameterType="Long" resultMap="CourseInfoResult">
         <include refid="selectCourseInfoVo"/>
         where id = #{id}
@@ -105,7 +116,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteCourseInfoByIds" parameterType="String">
-        delete from tb_course_info where id in 
+        delete from tb_course_info where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

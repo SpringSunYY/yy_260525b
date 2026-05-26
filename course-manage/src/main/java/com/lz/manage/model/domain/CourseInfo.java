@@ -63,8 +63,11 @@ public class CourseInfo implements Serializable
     private String status;
 
     /** 老师 */
-    @Excel(name = "老师")
+    @Excel(name = "老师",type = Excel.Type.IMPORT)
     private Long userId;
+    @TableField(exist = false)
+    @Excel(name = "老师",type = Excel.Type.EXPORT)
+    private String userName;
 
     /** 备注 */
     @Excel(name = "备注")
