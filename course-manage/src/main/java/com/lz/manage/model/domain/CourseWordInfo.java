@@ -31,8 +31,11 @@ public class CourseWordInfo implements Serializable
     private Long id;
 
     /** 课程 */
-    @Excel(name = "课程")
+    @Excel(name = "课程",type = Excel.Type.IMPORT)
     private Long courseId;
+    @TableField(exist = false)
+    @Excel(name = "课程",type = Excel.Type.EXPORT)
+    private String courseName;
 
     /** 作业名称 */
     @Excel(name = "作业名称")
@@ -61,8 +64,11 @@ public class CourseWordInfo implements Serializable
     private String workFile;
 
     /** 老师 */
-    @Excel(name = "老师")
+    @Excel(name = "老师",type = Excel.Type.IMPORT)
     private Long teacherId;
+    @TableField(exist = false)
+    @Excel(name = "老师",type = Excel.Type.EXPORT)
+    private String teacherName;
 
     /** 备注 */
     @Excel(name = "备注")
