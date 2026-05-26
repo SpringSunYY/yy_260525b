@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.CourseInfoMapper">
+    
+    <resultMap type="CourseInfo" id="CourseInfoResult">
+        <result property="id"    column="id"    />
+        <result property="courseType"    column="course_type"    />
+        <result property="courseName"    column="course_name"    />
+        <result property="courseCover"    column="course_cover"    />
+        <result property="courseDesc"    column="course_desc"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="registerNum"    column="register_num"    />
+        <result property="likeNum"    column="like_num"    />
+        <result property="status"    column="status"    />
+        <result property="userId"    column="user_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCourseInfoVo">
+        select id, course_type, course_name, course_cover, course_desc, order_num, register_num, like_num, status, user_id, remark, create_by, create_time, update_by, update_time from tb_course_info
+    </sql>
+
+    <select id="selectCourseInfoList" parameterType="CourseInfo" resultMap="CourseInfoResult">
+        <include refid="selectCourseInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="courseType != null  and courseType != ''"> and course_type = #{courseType}</if>
+            <if test="courseName != null  and courseName != ''"> and course_name like concat('%', #{courseName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseInfoById" parameterType="Long" resultMap="CourseInfoResult">
+        <include refid="selectCourseInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourseInfo" parameterType="CourseInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_course_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseType != null and courseType != ''">course_type,</if>
+            <if test="courseName != null and courseName != ''">course_name,</if>
+            <if test="courseCover != null">course_cover,</if>
+            <if test="courseDesc != null">course_desc,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="registerNum != null">register_num,</if>
+            <if test="likeNum != null">like_num,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseType != null and courseType != ''">#{courseType},</if>
+            <if test="courseName != null and courseName != ''">#{courseName},</if>
+            <if test="courseCover != null">#{courseCover},</if>
+            <if test="courseDesc != null">#{courseDesc},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="registerNum != null">#{registerNum},</if>
+            <if test="likeNum != null">#{likeNum},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseInfo" parameterType="CourseInfo">
+        update tb_course_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseType != null and courseType != ''">course_type = #{courseType},</if>
+            <if test="courseName != null and courseName != ''">course_name = #{courseName},</if>
+            <if test="courseCover != null">course_cover = #{courseCover},</if>
+            <if test="courseDesc != null">course_desc = #{courseDesc},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="registerNum != null">register_num = #{registerNum},</if>
+            <if test="likeNum != null">like_num = #{likeNum},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseInfoById" parameterType="Long">
+        delete from tb_course_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseInfoByIds" parameterType="String">
+        delete from tb_course_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

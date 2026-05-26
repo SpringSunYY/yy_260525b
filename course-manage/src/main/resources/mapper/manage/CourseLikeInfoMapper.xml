@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.CourseLikeInfoMapper">
+    
+    <resultMap type="CourseLikeInfo" id="CourseLikeInfoResult">
+        <result property="id"    column="id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="teacherId"    column="teacher_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectCourseLikeInfoVo">
+        select id, course_id, teacher_id, user_id, create_time from tb_course_like_info
+    </sql>
+
+    <select id="selectCourseLikeInfoList" parameterType="CourseLikeInfo" resultMap="CourseLikeInfoResult">
+        <include refid="selectCourseLikeInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="teacherId != null "> and teacher_id = #{teacherId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseLikeInfoById" parameterType="Long" resultMap="CourseLikeInfoResult">
+        <include refid="selectCourseLikeInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourseLikeInfo" parameterType="CourseLikeInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_course_like_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="teacherId != null">teacher_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="teacherId != null">#{teacherId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseLikeInfo" parameterType="CourseLikeInfo">
+        update tb_course_like_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseLikeInfoById" parameterType="Long">
+        delete from tb_course_like_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseLikeInfoByIds" parameterType="String">
+        delete from tb_course_like_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

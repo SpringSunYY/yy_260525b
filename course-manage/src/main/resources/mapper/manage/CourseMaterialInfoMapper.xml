@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.CourseMaterialInfoMapper">
+    
+    <resultMap type="CourseMaterialInfo" id="CourseMaterialInfoResult">
+        <result property="id"    column="id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="material"    column="material"    />
+        <result property="materialCover"    column="material_cover"    />
+        <result property="materialDesc"    column="material_desc"    />
+        <result property="materialFile"    column="material_file"    />
+        <result property="userId"    column="user_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCourseMaterialInfoVo">
+        select id, course_id, material, material_cover, material_desc, material_file, user_id, remark, create_by, create_time, update_by, update_time from tb_course_material_info
+    </sql>
+
+    <select id="selectCourseMaterialInfoList" parameterType="CourseMaterialInfo" resultMap="CourseMaterialInfoResult">
+        <include refid="selectCourseMaterialInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="material != null  and material != ''"> and material = #{material}</if>
+            <if test="materialCover != null  and materialCover != ''"> and material_cover = #{materialCover}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseMaterialInfoById" parameterType="Long" resultMap="CourseMaterialInfoResult">
+        <include refid="selectCourseMaterialInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourseMaterialInfo" parameterType="CourseMaterialInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_course_material_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="material != null and material != ''">material,</if>
+            <if test="materialCover != null">material_cover,</if>
+            <if test="materialDesc != null">material_desc,</if>
+            <if test="materialFile != null">material_file,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="material != null and material != ''">#{material},</if>
+            <if test="materialCover != null">#{materialCover},</if>
+            <if test="materialDesc != null">#{materialDesc},</if>
+            <if test="materialFile != null">#{materialFile},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseMaterialInfo" parameterType="CourseMaterialInfo">
+        update tb_course_material_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="material != null and material != ''">material = #{material},</if>
+            <if test="materialCover != null">material_cover = #{materialCover},</if>
+            <if test="materialDesc != null">material_desc = #{materialDesc},</if>
+            <if test="materialFile != null">material_file = #{materialFile},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseMaterialInfoById" parameterType="Long">
+        delete from tb_course_material_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseMaterialInfoByIds" parameterType="String">
+        delete from tb_course_material_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

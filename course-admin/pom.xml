@@ -54,6 +54,11 @@
             <artifactId>course-generator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.lz</groupId>
+            <artifactId>course-manage</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

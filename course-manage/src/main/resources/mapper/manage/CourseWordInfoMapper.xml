@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.CourseWordInfoMapper">
+    
+    <resultMap type="CourseWordInfo" id="CourseWordInfoResult">
+        <result property="id"    column="id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="wordName"    column="word_name"    />
+        <result property="status"    column="status"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="workContent"    column="work_content"    />
+        <result property="workFile"    column="work_file"    />
+        <result property="teacherId"    column="teacher_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCourseWordInfoVo">
+        select id, course_id, word_name, status, start_time, end_time, work_content, work_file, teacher_id, remark, create_by, create_time, update_by, update_time from tb_course_word_info
+    </sql>
+
+    <select id="selectCourseWordInfoList" parameterType="CourseWordInfo" resultMap="CourseWordInfoResult">
+        <include refid="selectCourseWordInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="wordName != null  and wordName != ''"> and word_name like concat('%', #{wordName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="teacherId != null "> and teacher_id = #{teacherId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseWordInfoById" parameterType="Long" resultMap="CourseWordInfoResult">
+        <include refid="selectCourseWordInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourseWordInfo" parameterType="CourseWordInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_course_word_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="wordName != null and wordName != ''">word_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="workContent != null">work_content,</if>
+            <if test="workFile != null">work_file,</if>
+            <if test="teacherId != null">teacher_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="wordName != null and wordName != ''">#{wordName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="workContent != null">#{workContent},</if>
+            <if test="workFile != null">#{workFile},</if>
+            <if test="teacherId != null">#{teacherId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseWordInfo" parameterType="CourseWordInfo">
+        update tb_course_word_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="wordName != null and wordName != ''">word_name = #{wordName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="workContent != null">work_content = #{workContent},</if>
+            <if test="workFile != null">work_file = #{workFile},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseWordInfoById" parameterType="Long">
+        delete from tb_course_word_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseWordInfoByIds" parameterType="String">
+        delete from tb_course_word_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

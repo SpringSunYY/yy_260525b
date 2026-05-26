@@ -190,6 +190,11 @@
                 <artifactId>course-common</artifactId>
                 <version>${course.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.lz</groupId>
+                <artifactId>course-manage</artifactId>
+                <version>${course.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -201,6 +206,7 @@
         <module>course-quartz</module>
         <module>course-generator</module>
         <module>course-common</module>
+        <module>course-manage</module>
     </modules>
     <packaging>pom</packaging>
 
