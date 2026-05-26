@@ -105,6 +105,18 @@ public class CourseWordSubmitInfoController extends BaseController
     }
 
     /**
+     * 审批作业
+     */
+    @PreAuthorize("@ss.hasPermi('manage:courseWordSubmitInfo:auth')")
+    @Log(title = "作业提交", businessType = BusinessType.UPDATE)
+    @PutMapping("/auth")
+    public AjaxResult auth(@RequestBody CourseWordSubmitInfoEdit courseWordSubmitInfoEdit)
+    {
+        CourseWordSubmitInfo courseWordSubmitInfo = CourseWordSubmitInfoEdit.editToObj(courseWordSubmitInfoEdit);
+        return toAjax(courseWordSubmitInfoService.authCourseWordSubmitInfo(courseWordSubmitInfo));
+    }
+
+    /**
      * 删除作业提交
      */
     @PreAuthorize("@ss.hasPermi('manage:courseWordSubmitInfo:remove')")

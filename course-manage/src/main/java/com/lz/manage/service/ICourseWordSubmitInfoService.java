@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * 作业提交Service接口
- * 
+ *
  * @author YY
  * @date 2026-05-26
  */
@@ -18,7 +18,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
     //region mybatis代码
     /**
      * 查询作业提交
-     * 
+     *
      * @param id 作业提交主键
      * @return 作业提交
      */
@@ -26,7 +26,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
 
     /**
      * 查询作业提交列表
-     * 
+     *
      * @param courseWordSubmitInfo 作业提交
      * @return 作业提交集合
      */
@@ -34,7 +34,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
 
     /**
      * 新增作业提交
-     * 
+     *
      * @param courseWordSubmitInfo 作业提交
      * @return 结果
      */
@@ -42,7 +42,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
 
     /**
      * 修改作业提交
-     * 
+     *
      * @param courseWordSubmitInfo 作业提交
      * @return 结果
      */
@@ -50,7 +50,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
 
     /**
      * 批量删除作业提交
-     * 
+     *
      * @param ids 需要删除的作业提交主键集合
      * @return 结果
      */
@@ -58,7 +58,7 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
 
     /**
      * 删除作业提交信息
-     * 
+     *
      * @param id 作业提交主键
      * @return 结果
      */
@@ -79,4 +79,6 @@ public interface ICourseWordSubmitInfoService extends IService<CourseWordSubmitI
      * @return CourseWordSubmitInfoVO集合
      */
     List<CourseWordSubmitInfoVo> convertVoList(List<CourseWordSubmitInfo> courseWordSubmitInfoList);
+
+    int authCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo);
 }

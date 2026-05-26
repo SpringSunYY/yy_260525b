@@ -90,27 +90,27 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-<!--        <el-button-->
-<!--            type="primary"-->
-<!--            plain-->
-<!--            icon="Plus"-->
-<!--            @click="handleAdd"-->
-<!--            v-hasPermi="['manage:courseWordSubmitInfo:add']"-->
-<!--        >新增-->
-<!--        </el-button>-->
-<!--      </el-col>-->
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--            type="success"-->
-<!--            plain-->
-<!--            icon="Edit"-->
-<!--            :disabled="single"-->
-<!--            @click="handleUpdate"-->
-<!--            v-hasPermi="['manage:courseWordSubmitInfo:edit']"-->
-<!--        >修改-->
-<!--        </el-button>-->
-<!--      </el-col>-->
-<!--      <el-col :span="1.5">-->
+        <!--        <el-button-->
+        <!--            type="primary"-->
+        <!--            plain-->
+        <!--            icon="Plus"-->
+        <!--            @click="handleAdd"-->
+        <!--            v-hasPermi="['manage:courseWordSubmitInfo:add']"-->
+        <!--        >新增-->
+        <!--        </el-button>-->
+        <!--      </el-col>-->
+        <!--      <el-col :span="1.5">-->
+        <!--        <el-button-->
+        <!--            type="success"-->
+        <!--            plain-->
+        <!--            icon="Edit"-->
+        <!--            :disabled="single"-->
+        <!--            @click="handleUpdate"-->
+        <!--            v-hasPermi="['manage:courseWordSubmitInfo:edit']"-->
+        <!--        >修改-->
+        <!--        </el-button>-->
+        <!--      </el-col>-->
+        <!--      <el-col :span="1.5">-->
         <el-button
             type="danger"
             plain
@@ -200,6 +200,9 @@
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['manage:courseWordSubmitInfo:edit']">提交
           </el-button>
+          <el-button link type="primary" icon="Auth" @click="handleAuth(scope.row)"
+                     v-hasPermi="['manage:courseWordSubmitInfo:auth']">审批
+          </el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['manage:courseWordSubmitInfo:remove']">删除
           </el-button>
@@ -286,12 +289,39 @@
         </div>
       </template>
     </el-dialog>
+    <!-- 添加或修改作业提交对话框 -->
+    <el-dialog :title="title" v-model="openAuth" width="500px" append-to-body>
+      <el-form ref="courseWordSubmitInfoRef" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="批阅状态" prop="reviewStatus">
+          <el-radio-group v-model="form.reviewStatus">
+            <el-radio
+                v-for="dict in course_word_submit_review_status"
+                :key="dict.value"
+                :value="dict.value"
+            >{{ dict.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="分数" prop="score">
+          <el-input-number style="width: 100%" :min="0" :max="100" :precision="2" v-model="form.score" placeholder="请输入分数"/>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitFormAuth">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="CourseWordSubmitInfo">
 import {
-  addCourseWordSubmitInfo,
+  addCourseWordSubmitInfo, authCourseWordSubmitInfo,
   delCourseWordSubmitInfo,
   getCourseWordSubmitInfo,
   listCourseWordSubmitInfo,
@@ -344,6 +374,9 @@ const data = reactive({
     ],
     reviewStatus: [
       {required: true, message: "批阅状态不能为空", trigger: "change"}
+    ],
+    score: [
+      {required: true, message: "分数不能为空", trigger: "blur"}
     ],
     teacherId: [
       {required: true, message: "老师不能为空", trigger: "blur"}
@@ -400,6 +433,7 @@ function getList() {
 // 取消按钮
 function cancel() {
   open.value = false;
+  openAuth.value = false;
   reset();
 }
 
@@ -526,5 +560,26 @@ const remoteGetCourseList = (query) => {
 }
 
 getCourseList()
+
+const openAuth = ref(false);
+const handleAuth = (row) => {
+  getCourseWordSubmitInfo(row.id).then(response => {
+    form.value = response.data;
+    openAuth.value = true;
+    this.title = "审批作业";
+  });
+}
+
+const submitFormAuth = () => {
+  proxy.$refs["courseWordSubmitInfoRef"].validate(valid => {
+    if (!valid) return
+    authCourseWordSubmitInfo(form.value).then(response => {
+      proxy.$modal.msgSuccess("审批成功");
+      openAuth.value = false;
+      getList();
+    });
+  });
+}
+
 getList();
 </script>

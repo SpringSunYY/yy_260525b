@@ -199,4 +199,9 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
         }
         return courseWordSubmitInfoList.stream().map(CourseWordSubmitInfoVo::objToVo).collect(Collectors.toList());
     }
+
+    @Override
+    public int authCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo) {
+        return this.updateCourseWordSubmitInfo(courseWordSubmitInfo);
+    }
 }
