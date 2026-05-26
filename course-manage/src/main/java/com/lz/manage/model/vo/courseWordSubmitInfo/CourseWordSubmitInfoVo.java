@@ -1,15 +1,14 @@
 package com.lz.manage.model.vo.courseWordSubmitInfo;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.math.BigDecimal;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import com.lz.common.annotation.Excel;
-import org.springframework.beans.BeanUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.manage.model.domain.CourseWordSubmitInfo;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
 /**
  * 作业提交Vo对象 tb_course_word_submit_info
  *
@@ -17,67 +16,104 @@ import com.lz.manage.model.domain.CourseWordSubmitInfo;
  * @date 2026-05-26
  */
 @Data
-public class CourseWordSubmitInfoVo implements Serializable
-{
+public class CourseWordSubmitInfoVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /** 编号 */
+    /**
+     * 编号
+     */
     private Long id;
 
-    /** 课程 */
+    /**
+     * 课程
+     */
     private Long courseId;
+    private String courseName;
 
-    /** 作业 */
+    /**
+     * 作业
+     */
     private Long wordId;
+    private String wordName;
 
-    /** 状态 */
+    /**
+     * 状态
+     */
     private String status;
 
-    /** 提交内容 */
+    /**
+     * 提交内容
+     */
     private String submitContent;
 
-    /** 提交文件 */
+    /**
+     * 提交文件
+     */
     private String submitFile;
 
-    /** 提交时间 */
+    /**
+     * 提交时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date submitTime;
 
-    /** 批阅状态 */
+    /**
+     * 批阅状态
+     */
     private String reviewStatus;
 
-    /** 分数 */
+    /**
+     * 分数
+     */
     private BigDecimal score;
 
-    /** 批阅时间 */
+    /**
+     * 批阅时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date reviewTime;
 
-    /** 老师 */
+    /**
+     * 老师
+     */
     private Long teacherId;
+    private String teacherName;
 
-    /** 学生 */
+    /**
+     * 学生
+     */
     private Long userId;
+    private String userName;
 
-    /** 备注 */
+    /**
+     * 备注
+     */
     private String remark;
 
-    /** 创建人 */
+    /**
+     * 创建人
+     */
     private String createBy;
 
-    /** 创建时间 */
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
-    /** 更新人 */
+    /**
+     * 更新人
+     */
     private String updateBy;
 
-    /** 更新时间 */
+    /**
+     * 更新时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
 
 
-     /**
+    /**
      * 对象转封装类
      *
      * @param courseWordSubmitInfo CourseWordSubmitInfo实体对象

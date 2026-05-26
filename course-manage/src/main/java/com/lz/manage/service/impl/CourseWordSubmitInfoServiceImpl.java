@@ -1,24 +1,29 @@
 package com.lz.manage.service.impl;
 
-import java.util.*;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-import com.lz.common.utils.StringUtils;
-import java.math.BigDecimal;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lz.common.utils.DateUtils;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lz.common.core.domain.entity.SysUser;
+import com.lz.common.exception.ServiceException;
+import com.lz.common.utils.DateUtils;
+import com.lz.common.utils.StringUtils;
+import com.lz.common.utils.ThrowUtils;
+import com.lz.manage.enums.CourseWordSubmitReviewStatusEnum;
+import com.lz.manage.enums.CourseWordSubmitStatusEnum;
 import com.lz.manage.mapper.CourseWordSubmitInfoMapper;
+import com.lz.manage.model.domain.CourseInfo;
+import com.lz.manage.model.domain.CourseWordInfo;
 import com.lz.manage.model.domain.CourseWordSubmitInfo;
-import com.lz.manage.service.ICourseWordSubmitInfoService;
 import com.lz.manage.model.dto.courseWordSubmitInfo.CourseWordSubmitInfoQuery;
 import com.lz.manage.model.vo.courseWordSubmitInfo.CourseWordSubmitInfoVo;
+import com.lz.manage.service.ICourseInfoService;
+import com.lz.manage.service.ICourseWordInfoService;
+import com.lz.manage.service.ICourseWordSubmitInfoService;
+import com.lz.system.service.ISysUserService;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 作业提交Service业务层处理
@@ -27,13 +32,22 @@ import com.lz.manage.model.vo.courseWordSubmitInfo.CourseWordSubmitInfoVo;
  * @date 2026-05-26
  */
 @Service
-public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmitInfoMapper, CourseWordSubmitInfo> implements ICourseWordSubmitInfoService
-{
+public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmitInfoMapper, CourseWordSubmitInfo> implements ICourseWordSubmitInfoService {
 
     @Resource
     private CourseWordSubmitInfoMapper courseWordSubmitInfoMapper;
 
+    @Resource
+    private ICourseInfoService courseInfoService;
+
+    @Resource
+    private ISysUserService sysUserService;
+
+    @Resource
+    private ICourseWordInfoService courseWordInfoService;
+
     //region mybatis代码
+
     /**
      * 查询作业提交
      *
@@ -41,8 +55,7 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 作业提交
      */
     @Override
-    public CourseWordSubmitInfo selectCourseWordSubmitInfoById(Long id)
-    {
+    public CourseWordSubmitInfo selectCourseWordSubmitInfoById(Long id) {
         return courseWordSubmitInfoMapper.selectCourseWordSubmitInfoById(id);
     }
 
@@ -53,9 +66,27 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 作业提交
      */
     @Override
-    public List<CourseWordSubmitInfo> selectCourseWordSubmitInfoList(CourseWordSubmitInfo courseWordSubmitInfo)
-    {
-        return courseWordSubmitInfoMapper.selectCourseWordSubmitInfoList(courseWordSubmitInfo);
+    public List<CourseWordSubmitInfo> selectCourseWordSubmitInfoList(CourseWordSubmitInfo courseWordSubmitInfo) {
+        List<CourseWordSubmitInfo> courseWordSubmitInfos = courseWordSubmitInfoMapper.selectCourseWordSubmitInfoList(courseWordSubmitInfo);
+        for (CourseWordSubmitInfo info : courseWordSubmitInfos) {
+            CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());
+            if (StringUtils.isNotNull(courseInfo)) {
+                info.setCourseName(courseInfo.getCourseName());
+            }
+            SysUser sysUser = sysUserService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(sysUser)) {
+                info.setUserName(sysUser.getUserName());
+            }
+            SysUser teacherUser = sysUserService.selectUserById(info.getTeacherId());
+            if (StringUtils.isNotNull(teacherUser)) {
+                info.setTeacherName(teacherUser.getUserName());
+            }
+            CourseWordInfo courseWordInfo = courseWordInfoService.selectCourseWordInfoById(info.getWordId());
+            if (StringUtils.isNotNull(courseWordInfo)) {
+                info.setWordName(courseWordInfo.getWordName());
+            }
+        }
+        return courseWordSubmitInfos;
     }
 
     /**
@@ -65,8 +96,7 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 结果
      */
     @Override
-    public int insertCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo)
-    {
+    public int insertCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo) {
         courseWordSubmitInfo.setCreateTime(DateUtils.getNowDate());
         return courseWordSubmitInfoMapper.insertCourseWordSubmitInfo(courseWordSubmitInfo);
     }
@@ -78,8 +108,28 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 结果
      */
     @Override
-    public int updateCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo)
-    {
+    public int updateCourseWordSubmitInfo(CourseWordSubmitInfo courseWordSubmitInfo) {
+        //修改的时候看看课程作业是否存在
+        CourseWordInfo courseWordInfo = courseWordInfoService.selectCourseWordInfoById(courseWordSubmitInfo.getWordId());
+        ThrowUtils.throwIf(
+                StringUtils.isNull(courseWordInfo),
+                "课程作业不存在"
+        );
+        //如果结束时间+1天小于当前时间
+        Date endTimePlusOneDay = new Date(courseWordInfo.getEndTime().getTime() + 24 * 60 * 60 * 1000);
+        ThrowUtils.throwIf(
+                endTimePlusOneDay.before(DateUtils.getNowDate()),
+                "课程作业已结束"
+        );
+        //如果传过来的是已提交
+        if (CourseWordSubmitStatusEnum.COURSE_WORD_SUBMIT_STATUS_1.getValue().equals(courseWordSubmitInfo.getStatus())) {
+            courseWordSubmitInfo.setSubmitTime(new Date());
+        }
+        //如果作业已经审批
+        CourseWordSubmitInfo submitInfoDb = courseWordSubmitInfoMapper.selectCourseWordSubmitInfoById(courseWordSubmitInfo.getId());
+        if (submitInfoDb.getReviewStatus().equals(CourseWordSubmitReviewStatusEnum.COURSE_WORD_SUBMIT_REVIEW_STATUS_1.getValue())) {
+            throw new ServiceException("作业已经审批");
+        }
         courseWordSubmitInfo.setUpdateTime(DateUtils.getNowDate());
         return courseWordSubmitInfoMapper.updateCourseWordSubmitInfo(courseWordSubmitInfo);
     }
@@ -91,8 +141,7 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 结果
      */
     @Override
-    public int deleteCourseWordSubmitInfoByIds(Long[] ids)
-    {
+    public int deleteCourseWordSubmitInfoByIds(Long[] ids) {
         return courseWordSubmitInfoMapper.deleteCourseWordSubmitInfoByIds(ids);
     }
 
@@ -103,13 +152,13 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      * @return 结果
      */
     @Override
-    public int deleteCourseWordSubmitInfoById(Long id)
-    {
+    public int deleteCourseWordSubmitInfoById(Long id) {
         return courseWordSubmitInfoMapper.deleteCourseWordSubmitInfoById(id);
     }
+
     //endregion
     @Override
-    public QueryWrapper<CourseWordSubmitInfo> getQueryWrapper(CourseWordSubmitInfoQuery courseWordSubmitInfoQuery){
+    public QueryWrapper<CourseWordSubmitInfo> getQueryWrapper(CourseWordSubmitInfoQuery courseWordSubmitInfoQuery) {
         QueryWrapper<CourseWordSubmitInfo> queryWrapper = new QueryWrapper<>();
         //如果不使用params可以删除
         Map<String, Object> params = courseWordSubmitInfoQuery.getParams();
@@ -117,28 +166,28 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
             params = new HashMap<>();
         }
         Long id = courseWordSubmitInfoQuery.getId();
-        queryWrapper.eq( StringUtils.isNotNull(id),"id",id);
+        queryWrapper.eq(StringUtils.isNotNull(id), "id", id);
 
         Long courseId = courseWordSubmitInfoQuery.getCourseId();
-        queryWrapper.eq( StringUtils.isNotNull(courseId),"course_id",courseId);
+        queryWrapper.eq(StringUtils.isNotNull(courseId), "course_id", courseId);
 
         Long wordId = courseWordSubmitInfoQuery.getWordId();
-        queryWrapper.eq( StringUtils.isNotNull(wordId),"word_id",wordId);
+        queryWrapper.eq(StringUtils.isNotNull(wordId), "word_id", wordId);
 
         String status = courseWordSubmitInfoQuery.getStatus();
-        queryWrapper.eq(StringUtils.isNotEmpty(status) ,"status",status);
+        queryWrapper.eq(StringUtils.isNotEmpty(status), "status", status);
 
         String reviewStatus = courseWordSubmitInfoQuery.getReviewStatus();
-        queryWrapper.eq(StringUtils.isNotEmpty(reviewStatus) ,"review_status",reviewStatus);
+        queryWrapper.eq(StringUtils.isNotEmpty(reviewStatus), "review_status", reviewStatus);
 
         Long teacherId = courseWordSubmitInfoQuery.getTeacherId();
-        queryWrapper.eq( StringUtils.isNotNull(teacherId),"teacher_id",teacherId);
+        queryWrapper.eq(StringUtils.isNotNull(teacherId), "teacher_id", teacherId);
 
         Long userId = courseWordSubmitInfoQuery.getUserId();
-        queryWrapper.eq( StringUtils.isNotNull(userId),"user_id",userId);
+        queryWrapper.eq(StringUtils.isNotNull(userId), "user_id", userId);
 
         Date createTime = courseWordSubmitInfoQuery.getCreateTime();
-        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime"))&&StringUtils.isNotNull(params.get("endCreateTime")),"create_time",params.get("beginCreateTime"),params.get("endCreateTime"));
+        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime")) && StringUtils.isNotNull(params.get("endCreateTime")), "create_time", params.get("beginCreateTime"), params.get("endCreateTime"));
 
         return queryWrapper;
     }

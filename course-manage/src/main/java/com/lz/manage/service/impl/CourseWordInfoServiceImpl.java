@@ -1,5 +1,6 @@
 package com.lz.manage.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.common.core.domain.entity.SysUser;
@@ -7,18 +8,23 @@ import com.lz.common.utils.DateUtils;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.common.utils.ThrowUtils;
-import com.lz.manage.enums.CourseWorkStatusEnum;
-import com.lz.manage.enums.ManageCourseStatusEnum;
+import com.lz.manage.enums.*;
 import com.lz.manage.mapper.CourseWordInfoMapper;
 import com.lz.manage.model.domain.CourseInfo;
+import com.lz.manage.model.domain.CourseRegisterInfo;
 import com.lz.manage.model.domain.CourseWordInfo;
+import com.lz.manage.model.domain.CourseWordSubmitInfo;
 import com.lz.manage.model.dto.courseWordInfo.CourseWordInfoQuery;
 import com.lz.manage.model.vo.courseWordInfo.CourseWordInfoVo;
 import com.lz.manage.service.ICourseInfoService;
+import com.lz.manage.service.ICourseRegisterInfoService;
 import com.lz.manage.service.ICourseWordInfoService;
+import com.lz.manage.service.ICourseWordSubmitInfoService;
 import com.lz.system.service.ISysUserService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,6 +46,13 @@ public class CourseWordInfoServiceImpl extends ServiceImpl<CourseWordInfoMapper,
 
     @Resource
     private ISysUserService sysUserService;
+
+    @Resource
+    @Lazy
+    private ICourseWordSubmitInfoService courseWordSubmitInfoService;
+
+    @Resource
+    private ICourseRegisterInfoService courseRegisterInfoService;
     //region mybatis代码
 
     /**
@@ -81,14 +94,37 @@ public class CourseWordInfoServiceImpl extends ServiceImpl<CourseWordInfoMapper,
      * @param courseWordInfo 课程作业
      * @return 结果
      */
+    @Transactional
     @Override
     public int insertCourseWordInfo(CourseWordInfo courseWordInfo) {     //查询课程是否存在
-        initCourseWork(courseWordInfo);
+        CourseInfo courseInfo = initCourseWork(courseWordInfo);
 
         courseWordInfo.setStatus(CourseWorkStatusEnum.COURSE_WORK_STATUS_0.getValue());
-        courseWordInfo.setCreateBy(SecurityUtils.getUsername());
-        courseWordInfo.setCreateTime(DateUtils.getNowDate());
-        return courseWordInfoMapper.insertCourseWordInfo(courseWordInfo);
+        String username = SecurityUtils.getUsername();
+        courseWordInfo.setCreateBy(username);
+        Date nowDate = DateUtils.getNowDate();
+        courseWordInfo.setCreateTime(nowDate);
+
+        //查询所有的选择这个课程的学生
+        List<CourseRegisterInfo> list = courseRegisterInfoService.list(new LambdaQueryWrapper<CourseRegisterInfo>()
+                .eq(CourseRegisterInfo::getCourseId, courseInfo.getId())
+                .eq(CourseRegisterInfo::getStatus, CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue()));
+        //创建作业提交集合
+        int i = courseWordInfoMapper.insertCourseWordInfo(courseWordInfo);
+        List<CourseWordSubmitInfo> courseWordSubmitInfos = list.stream().map(item -> {
+            CourseWordSubmitInfo courseWordSubmitInfo = new CourseWordSubmitInfo();
+            courseWordSubmitInfo.setCourseId(item.getCourseId());
+            courseWordSubmitInfo.setWordId(courseWordInfo.getId());
+            courseWordSubmitInfo.setStatus(CourseWordSubmitStatusEnum.COURSE_WORD_SUBMIT_STATUS_0.getValue());
+            courseWordSubmitInfo.setReviewStatus(CourseWordSubmitReviewStatusEnum.COURSE_WORD_SUBMIT_REVIEW_STATUS_0.getValue());
+            courseWordSubmitInfo.setTeacherId(item.getTeacherId());
+            courseWordSubmitInfo.setUserId(item.getUserId());
+            courseWordSubmitInfo.setCreateBy(username);
+            courseWordSubmitInfo.setCreateTime(nowDate);
+            return courseWordSubmitInfo;
+        }).toList();
+        courseWordSubmitInfoService.saveBatch(courseWordSubmitInfos);
+        return i;
     }
 
     /**
@@ -114,7 +150,7 @@ public class CourseWordInfoServiceImpl extends ServiceImpl<CourseWordInfoMapper,
         return courseWordInfoMapper.updateCourseWordInfo(courseWordInfo);
     }
 
-    private void initCourseWork(CourseWordInfo courseWordInfo) {
+    private CourseInfo initCourseWork(CourseWordInfo courseWordInfo) {
         CourseInfo courseInfo = courseInfoService.selectCourseInfoById(courseWordInfo.getCourseId());
         ThrowUtils.throwIf(StringUtils.isNull(courseInfo), "课程不存在");
         //如果课程不是开启
@@ -131,6 +167,7 @@ public class CourseWordInfoServiceImpl extends ServiceImpl<CourseWordInfoMapper,
                 courseWordInfo.getEndTime().before(courseWordInfo.getStartTime()),
                 "结束时间不能小于当前时间或开始时间"
         );
+        return courseInfo;
     }
 
     /**

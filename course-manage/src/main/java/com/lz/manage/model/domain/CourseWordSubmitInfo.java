@@ -32,12 +32,18 @@ public class CourseWordSubmitInfo implements Serializable
     private Long id;
 
     /** 课程 */
-    @Excel(name = "课程")
+    @Excel(name = "课程",type = Excel.Type.IMPORT)
     private Long courseId;
+    @TableField(exist = false)
+    @Excel(name = "课程",type = Excel.Type.EXPORT)
+    private String courseName;
 
     /** 作业 */
-    @Excel(name = "作业")
+    @Excel(name = "作业",type = Excel.Type.IMPORT)
     private Long wordId;
+    @TableField(exist = false)
+    @Excel(name = "作业",type = Excel.Type.EXPORT)
+    private String wordName;
 
     /** 状态 */
     @Excel(name = "状态", dictType = "course_word_submit_status")
@@ -70,12 +76,18 @@ public class CourseWordSubmitInfo implements Serializable
     private Date reviewTime;
 
     /** 老师 */
-    @Excel(name = "老师")
+    @Excel(name = "老师",type = Excel.Type.IMPORT)
     private Long teacherId;
+    @TableField(exist = false)
+    @Excel(name = "老师",type = Excel.Type.EXPORT)
+    private String teacherName;
 
     /** 学生 */
-    @Excel(name = "学生")
+    @Excel(name = "学生",type = Excel.Type.IMPORT)
     private Long userId;
+    @TableField(exist = false)
+    @Excel(name = "学生",type = Excel.Type.EXPORT)
+    private String userName;
 
     /** 备注 */
     @Excel(name = "备注")
