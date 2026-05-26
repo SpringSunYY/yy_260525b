@@ -1,11 +1,11 @@
 package com.lz.manage.model.dto.courseMaterialInfo;
 
-import java.io.Serializable;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lz.manage.model.domain.CourseMaterialInfo;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
-import com.lz.manage.model.domain.CourseMaterialInfo;
+
+import java.io.Serializable;
+
 /**
  * 课程资料Vo对象 tb_course_material_info
  *
@@ -13,29 +13,43 @@ import com.lz.manage.model.domain.CourseMaterialInfo;
  * @date 2026-05-26
  */
 @Data
-public class CourseMaterialInfoEdit implements Serializable
-{
+public class CourseMaterialInfoEdit implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /** 课程 */
+    private Long id;
+    /**
+     * 课程
+     */
     private Long courseId;
 
-    /** 资料名称 */
+    /**
+     * 资料名称
+     */
     private String material;
 
-    /** 封面 */
+    /**
+     * 封面
+     */
     private String materialCover;
 
-    /** 课程描述 */
+    /**
+     * 课程描述
+     */
     private String materialDesc;
 
-    /** 课程文件 */
+    /**
+     * 课程文件
+     */
     private String materialFile;
 
-    /** 老师 */
+    /**
+     * 老师
+     */
     private Long userId;
 
-    /** 备注 */
+    /**
+     * 备注
+     */
     private String remark;
 
     /**

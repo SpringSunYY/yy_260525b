@@ -1,14 +1,13 @@
 package com.lz.manage.model.vo.courseMaterialInfo;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import com.lz.common.annotation.Excel;
-import org.springframework.beans.BeanUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.manage.model.domain.CourseMaterialInfo;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
+
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 课程资料Vo对象 tb_course_material_info
  *
@@ -16,50 +15,74 @@ import com.lz.manage.model.domain.CourseMaterialInfo;
  * @date 2026-05-26
  */
 @Data
-public class CourseMaterialInfoVo implements Serializable
-{
+public class CourseMaterialInfoVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /** 编号 */
+    /**
+     * 编号
+     */
     private Long id;
 
-    /** 课程 */
+    /**
+     * 课程
+     */
     private Long courseId;
+    private String courseName;
 
-    /** 资料名称 */
+    /**
+     * 资料名称
+     */
     private String material;
 
-    /** 封面 */
+    /**
+     * 封面
+     */
     private String materialCover;
 
-    /** 课程描述 */
+    /**
+     * 资料描述
+     */
     private String materialDesc;
 
-    /** 课程文件 */
+    /**
+     * 资料文件
+     */
     private String materialFile;
 
-    /** 老师 */
+    /**
+     * 老师
+     */
     private Long userId;
-
-    /** 备注 */
+    private String userName;
+    /**
+     * 备注
+     */
     private String remark;
 
-    /** 创建人 */
+    /**
+     * 创建人
+     */
     private String createBy;
 
-    /** 创建时间 */
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
-    /** 更新人 */
+    /**
+     * 更新人
+     */
     private String updateBy;
 
-    /** 更新时间 */
+    /**
+     * 更新时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
 
 
-     /**
+    /**
      * 对象转封装类
      *
      * @param courseMaterialInfo CourseMaterialInfo实体对象

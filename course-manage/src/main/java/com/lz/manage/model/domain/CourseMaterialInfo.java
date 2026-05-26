@@ -31,8 +31,11 @@ public class CourseMaterialInfo implements Serializable
     private Long id;
 
     /** 课程 */
-    @Excel(name = "课程")
+    @Excel(name = "课程", type = Excel.Type.IMPORT)
     private Long courseId;
+    @TableField(exist = false)
+    @Excel(name = "课程", type = Excel.Type.EXPORT)
+    private String courseName;
 
     /** 资料名称 */
     @Excel(name = "资料名称")
@@ -42,17 +45,20 @@ public class CourseMaterialInfo implements Serializable
     @Excel(name = "封面")
     private String materialCover;
 
-    /** 课程描述 */
-    @Excel(name = "课程描述")
+    /** 资料描述 */
+    @Excel(name = "资料描述")
     private String materialDesc;
 
-    /** 课程文件 */
-    @Excel(name = "课程文件")
+    /** 资料文件 */
+    @Excel(name = "资料文件")
     private String materialFile;
 
     /** 老师 */
-    @Excel(name = "老师")
+    @Excel(name = "老师", type = Excel.Type.IMPORT)
     private Long userId;
+    @TableField(exist = false)
+    @Excel(name = "老师", type = Excel.Type.EXPORT)
+    private String userName;
 
     /** 备注 */
     @Excel(name = "备注")
