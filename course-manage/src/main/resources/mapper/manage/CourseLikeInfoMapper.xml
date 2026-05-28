@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.manage.mapper.CourseLikeInfoMapper">
-    
+
     <resultMap type="CourseLikeInfo" id="CourseLikeInfoResult">
         <result property="id"    column="id"    />
         <result property="courseId"    column="course_id"    />
@@ -18,15 +18,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectCourseLikeInfoList" parameterType="CourseLikeInfo" resultMap="CourseLikeInfoResult">
         <include refid="selectCourseLikeInfoVo"/>
-        <where>  
+        <where>
             <if test="id != null "> and id = #{id}</if>
             <if test="courseId != null "> and course_id = #{courseId}</if>
             <if test="teacherId != null "> and teacher_id = #{teacherId}</if>
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
         </where>
+        order by create_time desc
     </select>
-    
+
     <select id="selectCourseLikeInfoById" parameterType="Long" resultMap="CourseLikeInfoResult">
         <include refid="selectCourseLikeInfoVo"/>
         where id = #{id}
@@ -64,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteCourseLikeInfoByIds" parameterType="String">
-        delete from tb_course_like_info where id in 
+        delete from tb_course_like_info where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

@@ -96,6 +96,9 @@ public class CourseInfoVo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
 
+    private boolean isLike;
+    private boolean isRegister;
+
 
     /**
      * 对象转封装类

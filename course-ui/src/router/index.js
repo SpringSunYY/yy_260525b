@@ -136,6 +136,20 @@ export const dynamicRoutes = [
       }
     ]
   },
+    {
+    path: '/manage/courseInfo',
+    component: Layout,
+    hidden: true,
+    permissions: ['manage:courseInfo:list'],
+    children: [
+      {
+        path: 'index/:id(\\d+)',
+        component: () => import('@/views/manage/courseInfo/detail'),
+        name: 'CourseDetail',
+        meta: { title: '课程详情', activeMenu: '/course/courseInfo' }
+      }
+    ]
+  },
   {
     path: '/monitor/job-log',
     component: Layout,

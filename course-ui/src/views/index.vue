@@ -257,8 +257,7 @@ function resetQuery() {
 }
 
 function handleCardClick(row) {
-  proxy.$tab.closeAll();
-  proxy.$tab.openPage('/manage/courseInfo', '课程信息管理');
+  proxy.$tab.openPage('课程详情-' + row.courseName, '/manage/courseInfo/index/' + row.id);
 }
 
 const isAsc = ref();

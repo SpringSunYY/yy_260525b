@@ -64,7 +64,9 @@ public class CourseRegisterInfo implements Serializable {
     @Excel(name = "学生", type = Excel.Type.EXPORT)
     private String userName;
 
-    /** 备注 */
+    /**
+     * 备注
+     */
     @Excel(name = "备注")
     private String remark;
 

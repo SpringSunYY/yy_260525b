@@ -95,4 +95,10 @@ public class CourseInfo implements Serializable
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @TableField(exist = false)
     private Map<String, Object> params;
+
+
+    @TableField(exist = false)
+    private boolean isLike;
+    @TableField(exist = false)
+    private boolean isRegister;
 }
