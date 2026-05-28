@@ -339,7 +339,7 @@ const data = reactive({
     {key: 7, label: '点赞人数', visible: true},
     {key: 8, label: '状态', visible: true},
     {key: 9, label: '老师', visible: true},
-    {key: 10, label: '备注', visible: true},
+    {key: 10, label: '备注', visible: false},
     {key: 11, label: '创建人', visible: true},
     {key: 12, label: '创建时间', visible: true},
     {key: 13, label: '更新人', visible: false},

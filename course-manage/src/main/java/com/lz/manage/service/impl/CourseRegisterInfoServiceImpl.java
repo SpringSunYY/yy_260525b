@@ -101,7 +101,12 @@ public class CourseRegisterInfoServiceImpl extends ServiceImpl<CourseRegisterInf
                 .eq(CourseRegisterInfo::getCourseId, courseRegisterInfo.getCourseId())
                 .eq(CourseRegisterInfo::getUserId, courseRegisterInfo.getUserId()));
         ThrowUtils.throwIf(StringUtils.isNotEmpty(courseRegisterInfos), "已注册");
-
+        //更新课程人数
+        long count = this.count(new LambdaQueryWrapper<CourseRegisterInfo>()
+                .eq(CourseRegisterInfo::getCourseId, courseRegisterInfo.getCourseId())
+                .eq(CourseRegisterInfo::getStatus, CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue()));
+        courseInfo.setRegisterNum(count + 1);
+        courseInfoService.updateById(courseInfo);
         courseRegisterInfo.setStatus(CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue());
         courseRegisterInfo.setCreateBy(SecurityUtils.getUsername());
         courseRegisterInfo.setTeacherId(courseInfo.getUserId());
@@ -135,6 +140,12 @@ public class CourseRegisterInfoServiceImpl extends ServiceImpl<CourseRegisterInf
                 !registerInfoDb.getCourseId().equals(courseRegisterInfo.getCourseId()),
                 "课程不一致"
         );
+        //更新课程人数
+        long count = this.count(new LambdaQueryWrapper<CourseRegisterInfo>()
+                .eq(CourseRegisterInfo::getCourseId, courseRegisterInfo.getCourseId())
+                .eq(CourseRegisterInfo::getStatus, CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue()));
+        courseInfo.setRegisterNum(count);
+        courseInfoService.updateById(courseInfo);
         courseRegisterInfo.setUpdateBy(SecurityUtils.getUsername());
         courseRegisterInfo.setUpdateTime(DateUtils.getNowDate());
         return courseRegisterInfoMapper.updateCourseRegisterInfo(courseRegisterInfo);
