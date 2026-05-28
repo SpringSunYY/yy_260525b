@@ -232,6 +232,7 @@ import {
 } from "@/api/manage/courseRegisterInfo";
 import {listCourseInfo} from "@/api/manage/courseInfo.js";
 import {allocatedUserListAll} from "@/api/system/role.js";
+import useUserStore from '@/store/modules/user'
 
 const {proxy} = getCurrentInstance();
 const {course_register_status} = proxy.useDict('course_register_status');
@@ -420,7 +421,7 @@ const courseQueryParams = reactive({
   pageNum: 1,
   pageSize: 100,
   courseName: null,
-  courseStatus: '1'
+  status: '1',
 });
 const getCourseList = () => {
   courseLoading.value = true;
@@ -442,12 +443,20 @@ const userQueryParams = reactive({
   pageNum: 1,
   pageSize: 100,
   userName: null,
-  roleId: 2
+  roleId: 101
 });
 const getUserList = () => {
   userLoading.value = true;
   allocatedUserListAll(userQueryParams).then(response => {
-    userList.value = response.rows;
+    const roles = useUserStore().roles;
+    const userId = useUserStore().id;
+    if (roles.includes('student')) {
+      userList.value = response.rows;
+      //只显示自己
+      userList.value = userList.value.filter(item => item.userId === userId);
+    } else {
+      userList.value = response.rows;
+    }
     userLoading.value = false;
   });
 };

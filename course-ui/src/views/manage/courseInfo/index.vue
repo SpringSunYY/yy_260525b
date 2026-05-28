@@ -497,7 +497,7 @@ const userQueryParams = reactive({
   pageNum: 1,
   pageSize: 100,
   userName: null,
-  roleId: 2
+  roleId: 100
 });
 const getUserList = () => {
   userLoading.value = true;

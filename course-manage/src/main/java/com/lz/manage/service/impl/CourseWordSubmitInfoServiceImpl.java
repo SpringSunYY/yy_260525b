@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
 import com.lz.common.utils.DateUtils;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.common.utils.ThrowUtils;
 import com.lz.manage.enums.CourseWordSubmitReviewStatusEnum;
 import com.lz.manage.enums.CourseWordSubmitStatusEnum;
+import com.lz.manage.enums.CourseWorkStatusEnum;
 import com.lz.manage.mapper.CourseWordSubmitInfoMapper;
 import com.lz.manage.model.domain.CourseInfo;
 import com.lz.manage.model.domain.CourseWordInfo;
@@ -67,6 +69,16 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
      */
     @Override
     public List<CourseWordSubmitInfo> selectCourseWordSubmitInfoList(CourseWordSubmitInfo courseWordSubmitInfo) {
+        //如果不是管理员且是老师
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("teacher")) {
+            courseWordSubmitInfo.setTeacherId(SecurityUtils.getUserId());
+        }
+        //如果不是超级管理员是学生
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("student")) {
+            courseWordSubmitInfo.setUserId(SecurityUtils.getUserId());
+        }
         List<CourseWordSubmitInfo> courseWordSubmitInfos = courseWordSubmitInfoMapper.selectCourseWordSubmitInfoList(courseWordSubmitInfo);
         for (CourseWordSubmitInfo info : courseWordSubmitInfos) {
             CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());
@@ -117,10 +129,12 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
         );
         //如果结束时间+1天小于当前时间
         Date endTimePlusOneDay = new Date(courseWordInfo.getEndTime().getTime() + 24 * 60 * 60 * 1000);
-        ThrowUtils.throwIf(
-                endTimePlusOneDay.before(DateUtils.getNowDate()),
-                "课程作业已结束"
-        );
+        boolean before = endTimePlusOneDay.before(DateUtils.getNowDate());
+        if ( before){
+            courseWordSubmitInfo.setStatus(CourseWorkStatusEnum.COURSE_WORK_STATUS_1.getValue());
+            courseWordSubmitInfoMapper.updateCourseWordSubmitInfo(courseWordSubmitInfo);
+            throw new ServiceException("课程作业已结束");
+        }
         //如果传过来的是已提交
         if (CourseWordSubmitStatusEnum.COURSE_WORD_SUBMIT_STATUS_1.getValue().equals(courseWordSubmitInfo.getStatus())) {
             courseWordSubmitInfo.setSubmitTime(new Date());
@@ -129,6 +143,10 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
         CourseWordSubmitInfo submitInfoDb = courseWordSubmitInfoMapper.selectCourseWordSubmitInfoById(courseWordSubmitInfo.getId());
         if (submitInfoDb.getReviewStatus().equals(CourseWordSubmitReviewStatusEnum.COURSE_WORD_SUBMIT_REVIEW_STATUS_1.getValue())) {
             throw new ServiceException("作业已经审批");
+        }
+        //如果传过来的是已审批
+        if (CourseWordSubmitReviewStatusEnum.COURSE_WORD_SUBMIT_REVIEW_STATUS_1.getValue().equals(courseWordSubmitInfo.getReviewStatus())) {
+            courseWordSubmitInfo.setReviewTime(new Date());
         }
         courseWordSubmitInfo.setUpdateTime(DateUtils.getNowDate());
         return courseWordSubmitInfoMapper.updateCourseWordSubmitInfo(courseWordSubmitInfo);

@@ -63,6 +63,16 @@ public class CourseRegisterInfoServiceImpl extends ServiceImpl<CourseRegisterInf
      */
     @Override
     public List<CourseRegisterInfo> selectCourseRegisterInfoList(CourseRegisterInfo courseRegisterInfo) {
+        //如果不是管理员且是老师
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("teacher")) {
+            courseRegisterInfo.setTeacherId(SecurityUtils.getUserId());
+        }
+        //如果不是超级管理员是学生
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("student")) {
+            courseRegisterInfo.setUserId(SecurityUtils.getUserId());
+        }
         List<CourseRegisterInfo> courseRegisterInfos = courseRegisterInfoMapper.selectCourseRegisterInfoList(courseRegisterInfo);
         for (CourseRegisterInfo info : courseRegisterInfos) {
             CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());

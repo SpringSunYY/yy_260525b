@@ -404,7 +404,6 @@ const courseQueryParams = reactive({
   pageNum: 1,
   pageSize: 100,
   courseName: null,
-  roleId: 2
 });
 const getCourseList = () => {
   courseLoading.value = true;

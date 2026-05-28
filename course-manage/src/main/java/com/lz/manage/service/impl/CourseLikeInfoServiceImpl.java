@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.utils.DateUtils;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.common.utils.ThrowUtils;
 import com.lz.manage.mapper.CourseLikeInfoMapper;
@@ -62,6 +63,10 @@ public class CourseLikeInfoServiceImpl extends ServiceImpl<CourseLikeInfoMapper,
      */
     @Override
     public List<CourseLikeInfo> selectCourseLikeInfoList(CourseLikeInfo courseLikeInfo) {
+        //如果不是管理员只可以查看自己
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())) {
+            courseLikeInfo.setUserId(SecurityUtils.getUserId());
+        }
         List<CourseLikeInfo> courseLikeInfos = courseLikeInfoMapper.selectCourseLikeInfoList(courseLikeInfo);
         for (CourseLikeInfo info : courseLikeInfos) {
             CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());

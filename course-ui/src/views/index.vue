@@ -383,8 +383,6 @@ getList();
 }
 
 .course-type-tag {
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 12px;
