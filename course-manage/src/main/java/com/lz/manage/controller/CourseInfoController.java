@@ -42,7 +42,7 @@ public class CourseInfoController extends BaseController
     /**
      * 查询课程信息列表
      */
-    @PreAuthorize("@ss.hasPermi('manage:courseInfo:list')")
+    @PreAuthorize("@ss.hasAnyPermi('manage:courseInfo:list,manage:courseInfo:query')")
     @GetMapping("/list")
     public TableDataInfo list(CourseInfoQuery courseInfoQuery)
     {
