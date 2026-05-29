@@ -140,7 +140,7 @@ export const dynamicRoutes = [
     path: '/manage/courseInfo',
     component: Layout,
     hidden: true,
-    permissions: ['manage:courseInfo:list'],
+    permissions: ['manage:courseInfo:query'],
     children: [
       {
         path: 'index/:id(\\d+)',
