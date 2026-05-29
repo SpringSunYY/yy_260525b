@@ -28,12 +28,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectCourseWordInfoList" parameterType="CourseWordInfo" resultMap="CourseWordInfoResult">
         <include refid="selectCourseWordInfoVo"/>
         <where>
-            <if test="id != null "> and id = #{id}</if>
-            <if test="courseId != null "> and course_id = #{courseId}</if>
-            <if test="wordName != null  and wordName != ''"> and word_name like concat('%', #{wordName}, '%')</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="teacherId != null "> and teacher_id = #{teacherId}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="courseIds != null and courseIds.size() > 0">
+                <if test="courseIds.size() == 1">
+                    and course_id = #{courseIds[0]}
+                </if>
+                <if test="courseIds.size() > 1">
+                    and course_id in
+                    <foreach item="courseId" collection="courseIds" index="index" open="(" separator="," close=")">
+                        #{courseId}
+                    </foreach>
+                </if>
+            </if>
+            <if test="courseId != null ">and course_id = #{courseId}</if>
+            <if test="wordName != null  and wordName != ''">and word_name like concat('%', #{wordName}, '%')</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="teacherId != null ">and teacher_id = #{teacherId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
         order by create_time desc
     </select>

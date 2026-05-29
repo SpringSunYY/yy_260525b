@@ -197,7 +197,7 @@
 
 <script setup name="CourseDetail">
 import {getCourseInfo} from "@/api/manage/courseInfo";
-import {listCourseMaterialInfo} from "@/api/manage/courseMaterialInfo";
+import {listCourseMaterialInfo, listCourseMaterialInfoHome} from "@/api/manage/courseMaterialInfo";
 import {addCourseLikeInfo} from "@/api/manage/courseLikeInfo";
 import {addCourseRegisterInfo} from "@/api/manage/courseRegisterInfo";
 import {Document, InfoFilled, Picture, Star, User, UserFilled} from "@element-plus/icons-vue";
@@ -247,7 +247,7 @@ function getCourseDetail() {
 function getMaterials() {
   if (!materialQueryParams.courseId) return;
   materialsLoading.value = true;
-  listCourseMaterialInfo(materialQueryParams).then(response => {
+  listCourseMaterialInfoHome(materialQueryParams).then(response => {
     materialList.value = response.rows;
     total.value = response.total;
     materialsLoading.value = false;

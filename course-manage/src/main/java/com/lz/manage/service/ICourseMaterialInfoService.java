@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * 课程资料Service接口
- * 
+ *
  * @author YY
  * @date 2026-05-26
  */
@@ -18,7 +18,7 @@ public interface ICourseMaterialInfoService extends IService<CourseMaterialInfo>
     //region mybatis代码
     /**
      * 查询课程资料
-     * 
+     *
      * @param id 课程资料主键
      * @return 课程资料
      */
@@ -26,15 +26,17 @@ public interface ICourseMaterialInfoService extends IService<CourseMaterialInfo>
 
     /**
      * 查询课程资料列表
-     * 
+     *
      * @param courseMaterialInfo 课程资料
      * @return 课程资料集合
      */
     public List<CourseMaterialInfo> selectCourseMaterialInfoList(CourseMaterialInfo courseMaterialInfo);
 
+    List<CourseMaterialInfo> selectCourseMaterialInfoListHome(CourseMaterialInfo courseMaterialInfo);
+
     /**
      * 新增课程资料
-     * 
+     *
      * @param courseMaterialInfo 课程资料
      * @return 结果
      */
@@ -42,7 +44,7 @@ public interface ICourseMaterialInfoService extends IService<CourseMaterialInfo>
 
     /**
      * 修改课程资料
-     * 
+     *
      * @param courseMaterialInfo 课程资料
      * @return 结果
      */
@@ -50,7 +52,7 @@ public interface ICourseMaterialInfoService extends IService<CourseMaterialInfo>
 
     /**
      * 批量删除课程资料
-     * 
+     *
      * @param ids 需要删除的课程资料主键集合
      * @return 结果
      */
@@ -58,7 +60,7 @@ public interface ICourseMaterialInfoService extends IService<CourseMaterialInfo>
 
     /**
      * 删除课程资料信息
-     * 
+     *
      * @param id 课程资料主键
      * @return 结果
      */

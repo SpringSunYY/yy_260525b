@@ -130,14 +130,23 @@ public class CourseWordSubmitInfoServiceImpl extends ServiceImpl<CourseWordSubmi
         //如果结束时间+1天小于当前时间
         Date endTimePlusOneDay = new Date(courseWordInfo.getEndTime().getTime() + 24 * 60 * 60 * 1000);
         boolean before = endTimePlusOneDay.before(DateUtils.getNowDate());
-        if ( before){
+        if (before) {
             courseWordSubmitInfo.setStatus(CourseWorkStatusEnum.COURSE_WORK_STATUS_1.getValue());
             courseWordSubmitInfoMapper.updateCourseWordSubmitInfo(courseWordSubmitInfo);
             throw new ServiceException("课程作业已结束");
         }
+        //如果传过来的提交内容不为空
+        if (StringUtils.isNotEmpty(courseWordSubmitInfo.getSubmitContent())
+                || StringUtils.isNotEmpty(courseWordSubmitInfo.getSubmitFile())) {
+            courseWordSubmitInfo.setStatus(CourseWordSubmitStatusEnum.COURSE_WORD_SUBMIT_STATUS_1.getValue());
+        }
         //如果传过来的是已提交
         if (CourseWordSubmitStatusEnum.COURSE_WORD_SUBMIT_STATUS_1.getValue().equals(courseWordSubmitInfo.getStatus())) {
             courseWordSubmitInfo.setSubmitTime(new Date());
+        }
+        //如果传过来的分数不为空
+        if (StringUtils.isNotNull(courseWordSubmitInfo.getScore())) {
+            courseWordSubmitInfo.setReviewStatus(CourseWordSubmitReviewStatusEnum.COURSE_WORD_SUBMIT_REVIEW_STATUS_1.getValue());
         }
         //如果作业已经审批
         CourseWordSubmitInfo submitInfoDb = courseWordSubmitInfoMapper.selectCourseWordSubmitInfoById(courseWordSubmitInfo.getId());

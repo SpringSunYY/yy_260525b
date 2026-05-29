@@ -7,13 +7,16 @@ import com.lz.common.utils.DateUtils;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.common.utils.ThrowUtils;
+import com.lz.manage.enums.CourseRegisterStatusEnum;
 import com.lz.manage.mapper.CourseMaterialInfoMapper;
 import com.lz.manage.model.domain.CourseInfo;
 import com.lz.manage.model.domain.CourseMaterialInfo;
+import com.lz.manage.model.domain.CourseRegisterInfo;
 import com.lz.manage.model.dto.courseMaterialInfo.CourseMaterialInfoQuery;
 import com.lz.manage.model.vo.courseMaterialInfo.CourseMaterialInfoVo;
 import com.lz.manage.service.ICourseInfoService;
 import com.lz.manage.service.ICourseMaterialInfoService;
+import com.lz.manage.service.ICourseRegisterInfoService;
 import com.lz.system.service.ISysUserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,8 @@ public class CourseMaterialInfoServiceImpl extends ServiceImpl<CourseMaterialInf
     @Resource
     private ICourseInfoService courseInfoService;
 
+    @Resource
+    private ICourseRegisterInfoService courseRegisterInfoService;
     //region mybatis代码
 
     /**
@@ -60,6 +65,39 @@ public class CourseMaterialInfoServiceImpl extends ServiceImpl<CourseMaterialInf
      */
     @Override
     public List<CourseMaterialInfo> selectCourseMaterialInfoList(CourseMaterialInfo courseMaterialInfo) {
+        //如果是老师只可以查看自己的作业
+        //如果不是管理员且是老师
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("teacher")) {
+            courseMaterialInfo.setUserId(SecurityUtils.getUserId());
+        }
+        //如果不是超级管理员是学生
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("student")) {
+            //先查询到他注册的课程
+            CourseRegisterInfo courseRegisterInfo = new CourseRegisterInfo();
+            courseRegisterInfo.setStatus(CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue());
+            courseRegisterInfo.setUserId(SecurityUtils.getUserId());
+            List<CourseRegisterInfo> courseRegisterInfos = courseRegisterInfoService.selectCourseRegisterInfoList(courseRegisterInfo);
+            List<Long> courseIds = courseRegisterInfos.stream().map(CourseRegisterInfo::getCourseId).toList();
+            courseMaterialInfo.setCourseIds(courseIds);
+        }
+        List<CourseMaterialInfo> courseMaterialInfos = courseMaterialInfoMapper.selectCourseMaterialInfoList(courseMaterialInfo);
+        for (CourseMaterialInfo info : courseMaterialInfos) {
+            CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());
+            if (StringUtils.isNotNull(courseInfo)) {
+                info.setCourseName(courseInfo.getCourseName());
+            }
+            SysUser sysUser = sysUserService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(sysUser)) {
+                info.setUserName(sysUser.getUserName());
+            }
+        }
+        return courseMaterialInfos;
+    }
+
+    @Override
+    public List<CourseMaterialInfo> selectCourseMaterialInfoListHome(CourseMaterialInfo courseMaterialInfo) {
         List<CourseMaterialInfo> courseMaterialInfos = courseMaterialInfoMapper.selectCourseMaterialInfoList(courseMaterialInfo);
         for (CourseMaterialInfo info : courseMaterialInfos) {
             CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());

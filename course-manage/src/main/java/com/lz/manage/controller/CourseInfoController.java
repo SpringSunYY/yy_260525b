@@ -55,6 +55,19 @@ public class CourseInfoController extends BaseController
         return table;
     }
 
+    @PreAuthorize("@ss.hasPermi('manage:courseInfo:list')")
+    @GetMapping("/list/home")
+    public TableDataInfo listHome(CourseInfoQuery courseInfoQuery)
+    {
+        CourseInfo courseInfo = CourseInfoQuery.queryToObj(courseInfoQuery);
+        startPage();
+        List<CourseInfo> list = courseInfoService.selectCourseInfoListHome(courseInfo);
+        List<CourseInfoVo> listVo= list.stream().map(CourseInfoVo::objToVo).collect(Collectors.toList());
+        TableDataInfo table = getDataTable(list);
+        table.setRows(listVo);
+        return table;
+    }
+
     /**
      * 导出课程信息列表
      */

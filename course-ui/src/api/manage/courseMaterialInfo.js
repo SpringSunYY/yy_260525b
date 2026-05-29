@@ -9,6 +9,14 @@ export function listCourseMaterialInfo(query) {
   })
 }
 
+export function listCourseMaterialInfoHome(query) {
+  return request({
+    url: '/manage/courseMaterialInfo/list/home',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询课程资料详细
 export function getCourseMaterialInfo(id) {
   return request({

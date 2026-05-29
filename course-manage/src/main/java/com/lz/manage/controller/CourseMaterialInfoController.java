@@ -55,6 +55,18 @@ public class CourseMaterialInfoController extends BaseController
         return table;
     }
 
+    @PreAuthorize("@ss.hasPermi('manage:courseMaterialInfo:list')")
+    @GetMapping("/list/home")
+    public TableDataInfo home(CourseMaterialInfoQuery courseMaterialInfoQuery) {
+        CourseMaterialInfo courseMaterialInfo = CourseMaterialInfoQuery.queryToObj(courseMaterialInfoQuery);
+        startPage();
+        List<CourseMaterialInfo> list = courseMaterialInfoService.selectCourseMaterialInfoListHome(courseMaterialInfo);
+        List<CourseMaterialInfoVo> listVo = list.stream().map(CourseMaterialInfoVo::objToVo).collect(Collectors.toList());
+        TableDataInfo table = getDataTable(list);
+        table.setRows(listVo);
+        return table;
+    }
+
     /**
      * 导出课程资料列表
      */

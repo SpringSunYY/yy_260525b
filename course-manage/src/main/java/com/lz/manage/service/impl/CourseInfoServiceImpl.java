@@ -9,6 +9,7 @@ import com.lz.common.utils.DateUtils;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.common.utils.ThrowUtils;
+import com.lz.manage.enums.ManageCourseStatusEnum;
 import com.lz.manage.mapper.CourseInfoMapper;
 import com.lz.manage.model.domain.CourseInfo;
 import com.lz.manage.model.domain.CourseLikeInfo;
@@ -90,6 +91,29 @@ public class CourseInfoServiceImpl extends ServiceImpl<CourseInfoMapper, CourseI
             sortMappingFields =
                     {"create_time", "order_num", "register_num", "like_num"})
     public List<CourseInfo> selectCourseInfoList(CourseInfo courseInfo) {
+        //如果是老师只可以查看自己的作业
+        //如果不是管理员且是老师
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("teacher")) {
+            courseInfo.setUserId(SecurityUtils.getUserId());
+        }
+        List<CourseInfo> courseInfos = courseInfoMapper.selectCourseInfoList(courseInfo);
+        for (CourseInfo info : courseInfos) {
+            SysUser sysUser = sysUserService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(sysUser)) {
+                info.setUserName(sysUser.getUserName());
+            }
+        }
+        return courseInfos;
+    }
+
+    @Override
+    @CustomSort(sortFields =
+            {"createTime", "orderNum", "registerNum", "likeNum"},
+            sortMappingFields =
+                    {"create_time", "order_num", "register_num", "like_num"})
+    public List<CourseInfo> selectCourseInfoListHome(CourseInfo courseInfo) {
+        courseInfo.setStatus(ManageCourseStatusEnum.MANAGE_COURSE_STATUS_1.getValue());
         List<CourseInfo> courseInfos = courseInfoMapper.selectCourseInfoList(courseInfo);
         for (CourseInfo info : courseInfos) {
             SysUser sysUser = sysUserService.selectUserById(info.getUserId());

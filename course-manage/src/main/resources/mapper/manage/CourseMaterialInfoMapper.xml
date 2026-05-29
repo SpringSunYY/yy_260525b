@@ -27,6 +27,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCourseMaterialInfoVo"/>
         <where>
             <if test="id != null ">and id = #{id}</if>
+            <if test="courseIds != null and courseIds.size() > 0">
+                <if test="courseIds.size() == 1">
+                    and course_id = #{courseIds[0]}
+                </if>
+                <if test="courseIds.size() > 1">
+                    and course_id in
+                    <foreach item="courseId" collection="courseIds" index="index" open="(" separator="," close=")">
+                        #{courseId}
+                    </foreach>
+                </if>
+            </if>
+            <if test="userId != null">and user_id = #{userId}</if>
             <if test="courseId != null ">and course_id = #{courseId}</if>
             <if test="material != null  and material != ''">and material = #{material}</if>
             <if test="materialCover != null  and materialCover != ''">and material_cover = #{materialCover}</if>

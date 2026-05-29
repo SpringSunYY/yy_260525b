@@ -74,6 +74,23 @@ public class CourseWordInfoServiceImpl extends ServiceImpl<CourseWordInfoMapper,
      */
     @Override
     public List<CourseWordInfo> selectCourseWordInfoList(CourseWordInfo courseWordInfo) {
+        //如果是老师只可以查看自己的作业
+        //如果不是管理员且是老师
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("teacher")) {
+            courseWordInfo.setTeacherId(SecurityUtils.getUserId());
+        }
+        //如果不是超级管理员是学生
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())
+                && SecurityUtils.hasRole("student")) {
+            //先查询到他注册的课程
+            CourseRegisterInfo courseRegisterInfo = new CourseRegisterInfo();
+            courseRegisterInfo.setStatus(CourseRegisterStatusEnum.COURSE_REGISTER_STATUS_0.getValue());
+            courseRegisterInfo.setUserId(SecurityUtils.getUserId());
+            List<CourseRegisterInfo> courseRegisterInfos = courseRegisterInfoService.selectCourseRegisterInfoList(courseRegisterInfo);
+            List<Long> courseIds = courseRegisterInfos.stream().map(CourseRegisterInfo::getCourseId).toList();
+            courseWordInfo.setCourseIds(courseIds);
+        }
         List<CourseWordInfo> courseWordInfos = courseWordInfoMapper.selectCourseWordInfoList(courseWordInfo);
         for (CourseWordInfo info : courseWordInfos) {
             CourseInfo courseInfo = courseInfoService.selectCourseInfoById(info.getCourseId());

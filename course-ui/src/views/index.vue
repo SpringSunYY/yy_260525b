@@ -160,7 +160,7 @@
 </template>
 
 <script setup name="Index">
-import {listCourseInfo} from "@/api/manage/courseInfo";
+import {listCourseInfo, listCourseInfoHome} from "@/api/manage/courseInfo";
 import {allocatedUserListAll} from "@/api/system/role.js";
 import {Picture, Star, User, UserFilled} from "@element-plus/icons-vue";
 
@@ -221,7 +221,7 @@ function getList() {
     queryParams.value.params["orderByColumn"] = orderByColumn.value;
     queryParams.value.params["isAsc"] = isAsc.value;
   }
-  listCourseInfo(queryParams.value).then(response => {
+  listCourseInfoHome(queryParams.value).then(response => {
     courseInfoList.value = response.rows;
     total.value = response.total;
     loading.value = false;
