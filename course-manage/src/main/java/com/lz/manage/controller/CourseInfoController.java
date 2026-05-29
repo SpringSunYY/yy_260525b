@@ -55,7 +55,7 @@ public class CourseInfoController extends BaseController
         return table;
     }
 
-    @PreAuthorize("@ss.hasPermi('manage:courseInfo:list')")
+    @PreAuthorize("@ss.hasPermi('manage:courseInfo:query')")
     @GetMapping("/list/home")
     public TableDataInfo listHome(CourseInfoQuery courseInfoQuery)
     {

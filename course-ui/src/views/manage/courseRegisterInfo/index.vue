@@ -230,7 +230,7 @@ import {
   listCourseRegisterInfo,
   updateCourseRegisterInfo
 } from "@/api/manage/courseRegisterInfo";
-import {listCourseInfo} from "@/api/manage/courseInfo.js";
+import {listCourseInfo, listCourseInfoHome} from "@/api/manage/courseInfo.js";
 import {allocatedUserListAll} from "@/api/system/role.js";
 import useUserStore from '@/store/modules/user'
 
@@ -425,7 +425,7 @@ const courseQueryParams = reactive({
 });
 const getCourseList = () => {
   courseLoading.value = true;
-  listCourseInfo(courseQueryParams).then(response => {
+  listCourseInfoHome(courseQueryParams).then(response => {
     courseList.value = response.rows;
     courseLoading.value = false;
   });
